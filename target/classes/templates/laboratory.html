@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>实验室预约管理</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/css/my.css}">
+</head>
+<body>
+    <div class="comment">
+    <!-- 内容主体区域 -->
+        <!--搜索框-->
+        <form class="layui-form" method="post" style="margin-top: 10px">
+            <div class="layui-input-inline" style="margin-left: 10px">
+                <input type="text" name="laboratory_name" id="laboratory_new_name" autocomplete="off" placeholder="实验室名称" class="layui-input">
+            </div>
+            <div class="layui-input-inline">
+                <input type="text" name="laboratory_build" id="laboratory_new_build" autocomplete="off" placeholder="所在教学楼" class="layui-input">
+            </div>
+            <div class="layui-input-inline">
+                <input type="text" name="laboratory_capacity" id="laboratory_new_capacity" autocomplete="off" placeholder="容量" class="layui-input">
+            </div>
+            <div class="layui-input-inline">
+                <select	type="radio" class="layui-input" name="laboratory_use" id="laboratory_new_use" placeholder="状态">
+                    <option style="display: none"></option>
+                    <option value="空闲">空闲</option>
+                    <option value="使用">使用</option>
+                </select>
+            </div>
+            <button class="layui-icon layui-icon-search layui-btn" type="button" id="check"></button>
+        </form>
+
+        <table class="layui-hide" id="test" lay-filter="test"></table>
+
+        <div class="site-text" style="margin: 5%; display: none" id="window"  target="test123">
+            <form class="layui-form" id="book" method="post" lay-filter="example">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">实验室名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="laboratory_name" name="laboratory_name" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所在教学楼</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="laboratory_build" name="laboratory_build" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">教学楼编号</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="laboratory_num" name="laboratory_num" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">实验室容量</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="laboratory_capacity" name="laboratory_capacity" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">实验室状态</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="laboratory_use" name="laboratory_use" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">描述</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="laboratory_describe" name="laboratory_describe" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script th:src="@{/static/layui/layui.all.js}"></script>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+        <button id="add" class="layui-btn layui-btn-sm" lay-filter="pageSubmit">新增</button>
+    </div>
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script th:inline="none">
+    layui.use(['table','layer','form'], function(){
+        var table = layui.table;
+        var layer = layui.layer;
+        var form = layui.form;
+        var $=layui.$;
+
+        $('#check').on('click',(function() {
+            var laboratory_name= $('#laboratory_new_name').val();
+            var laboratory_build=$('#laboratory_new_build').val();
+            var laboratory_capacity=$('#laboratory_new_capacity').val();
+            var laboratory_use=$('#laboratory_new_use').val();
+                        table.reload('test', {//重载表格
+                            where:{
+                                'laboratory_name':laboratory_name,
+                                'laboratory_build':laboratory_build,
+                                'laboratory_capacity':laboratory_capacity,
+                                'laboratory_use':laboratory_use
+                            },
+                            page: {
+                                curr: 1
+                            }
+                        })
+                    })
+        )
+
+        table.render({
+            elem: '#test'
+            ,url:'/laboratory/findLaboratory'
+            ,toolbar: '#toolbarDemo'
+            ,title: '实验室数据表'
+            ,totalRow: true
+            ,cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true, totalRowText: '合计'}
+                ,{field:'laboratory_name', title:'实验室名', width:120, edit: 'text'}
+                ,{field:'laboratory_build', title:'所在教学楼', width:120, sort: true}
+                ,{field:'laboratory_num', title:'实验室编号', width:120, edit: 'text', sort: true}
+                ,{field:'laboratory_capacity', title:'实验室容量', width:120, sort: true}
+                ,{field:'laboratory_use', title:'状态',width:100}
+                ,{field:'laboratory_describe', title:'描述'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+            ]]
+            ,page: true
+        });
+
+        //工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'getCheckData':
+                    var data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                    break;
+                case 'getCheckLength':
+                    var data = checkStatus.data;
+                    layer.msg('选中了：'+ data.length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选': '未全选')
+                    break;
+            };
+        });
+
+        $("#add").click(function() {
+            layer.open({
+                type: 1,
+                title: "新增",
+                area: ['500px', '500px'],
+                btn: ['确定', '取消'],
+                content: $("#window"),
+                yes: function (index, layero) {
+                    $.post('/laboratory/addLaboratory', {
+                        laboratory_name: $('#laboratory_name').val(),
+                        laboratory_build: $('#laboratory_build').val(),
+                        laboratory_num: $('#laboratory_num').val(),
+                        laboratory_capacity: $('#laboratory_capacity').val(),
+                        laboratory_use: $('#laboratory_use').val(),
+                        laboratory_describe: $('#laboratory_describe').val()
+                    }, function (data) {
+                        //根据后台返回的参数，来进行判断
+                        if (data=="OK"){
+                            layer.msg("添加成功");
+                        } else{
+                            layer.msg("添加失败");
+                        }
+                        table.reload('test', {//重载表格
+                            page: {
+                                curr: 1
+                            }
+                        })
+                    });
+                }
+            });
+        });
+
+        //删除
+        table.on('tool(test)', function(obj){
+            var data = obj.data; //获得当前行数据
+            if(obj.event === 'del'){
+                layer.confirm('确定删除吗',{title:'删除'}, function(index){
+                    $.post("/laboratory/deleteLaboratory",{laboratory_id:data.laboratory_id},
+                        function(data) {
+                            if (data=="OK"){
+                                layer.msg("删除成功");
+                            } else{
+                                layer.msg("删除失败");
+                            }
+                            table.reload('test', {//重载表格
+                                page: {
+                                    curr: 1
+                                }
+                            })
+                        });
+                });
+            } else if(obj.event === 'edit'){ //编辑
+                layer.open({
+                    type: 1 //Page层类型
+                    ,skin: 'layui-layer-molv'
+                    ,area: ['500px', '500px']
+                    ,title: ['编辑实验室信息','font-size:18px']
+                    ,btn: ['确定', '取消']
+                    ,shadeClose: true
+                    ,shade: 0 //遮罩透明度
+                    ,maxmin: true //允许全屏最小化
+                    ,content:$("#window")  //弹窗路径
+                    ,success:function(layero,index){
+                        $('#laboratory_name').val(data.laboratory_name);
+                        $('#laboratory_build').val(data.laboratory_build);
+                        $('#laboratory_num').val(data.laboratory_num);
+                        $('#laboratory_capacity').val(data.laboratory_capacity);
+                        $('#laboratory_use').val(data.laboratory_use);
+                        $('#laboratory_describe').val(data.laboratory_describe);
+                    },yes:function(index,layero){
+                        $.post('/laboratory/updateLaboratory',{
+                            laboratory_id: data.laboratory_id,
+                            laboratory_name: $('#laboratory_name').val(),
+                            laboratory_build: $('#laboratory_build').val(),
+                            laboratory_num: $('#laboratory_num').val(),
+                            laboratory_capacity: $('#laboratory_capacity').val(),
+                            laboratory_use: $('#laboratory_use').val(),
+                            laboratory_describe: $('#laboratory_describe').val()
+                        },function(data){
+                            //根据后台返回的参数，来进行判断
+                            if (data=="OK"){
+                                layer.msg("修改成功");
+                            } else{
+                                layer.msg("修改失败");
+                            }
+                            table.reload('test',{//重载表格
+                                page:{
+                                    curr:1
+                                }
+                            })
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+
+</script>
+</body>
+</html>

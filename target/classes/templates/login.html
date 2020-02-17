@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <link rel="stylesheet" th:href="@{/static/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/static/css/style.css}">
+</head>
+<body>
+<div id="particles-js">
+    <form class="login" method="post" action="" id="login" name="form1">
+        <div class="login-top">登录</div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/name.png}"/></div>
+            <div class="login-center-input">
+                <input type="text" id="student_name" name="student_name" value="" placeholder="请输入您的用户名" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的用户名'"/>
+                <input type="hidden" name="teacher_name" id="teacher_name">
+                <input type="hidden" name="educational_name" id="educational_name">
+                <div class="login-center-input-text">用户名</div>
+            </div>
+        </div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/password.png}"/></div>
+            <div class="login-center-input">
+                <input type="password" id="student_pwd" name="student_pwd" value="" placeholder="请输入您的密码" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的密码'"/>
+                <input type="hidden" name="teacher_pwd" id="teacher_pwd">
+                <input type="hidden" name="educational_pwd" id="educational_pwd">
+                <div class="login-center-input-text">密码</div>
+            </div>
+        </div>
+        <div class="login-center clearfix">
+                <input type="radio" name="status" value="学生" checked/>学生
+                <input type="radio" name="status" value="教师" />教师
+                <input type="radio" name="status" value="教务人员" />教务人员
+        </div>
+        <div class="login-button">
+            <input type="button" value="登录" onclick="identify()">
+        </div>
+        <div class="login-button">
+            <input type="button" id="reg" value="注册" onclick="window.location.href='register'">
+        </div>
+    </form>
+    <div class="sk-rotating-plane"></div>
+</div>
+
+<!-- scripts -->
+<script th:src="@{/static/js/particles.min.js}"></script>
+<script th:src="@{/static/js/app.js}"></script>
+<script th:src="@{/static/jquery-3.3.1.min.js}"></script>
+<script>
+    function identify() {
+        var sta = $("input[name='status']:checked").val();
+        if (sta == "教师"){
+            document.getElementById("teacher_name").value = document.getElementById("student_name").value;
+            document.getElementById("teacher_pwd").value = document.getElementById("student_pwd").value;
+            document.form1.action="/teacher/selectTeacher";
+            document.form1.submit();
+        }else if (sta == "教务人员"){
+            document.getElementById("educational_name").value = document.getElementById("student_name").value;
+            document.getElementById("educational_pwd").value = document.getElementById("student_pwd").value;
+            document.form1.action="/educational/selectEducational";
+            document.form1.submit();
+        }else if (sta == "学生"){
+            document.form1.action="/student/selectStudent";
+            document.form1.submit();
+        }
+    }
+
+</script>
+</body>
+</html>

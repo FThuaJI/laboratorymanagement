@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>实验室预约</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/layui/css/global.css}">
+</head>
+<body>
+    <!--选项卡-->             
+       <div class="layui-tab" lay-filter="demo" style="margin-top: -117px">
+            <ul class="layui-tab-title">
+                    <li class="layui-this" mytitle="实验室预约详情" lay-id="11">实验室预约详情</li>
+                    <li mytitle="个人预约" lay-id="22" data-url="" type="button" >个人预约</li>
+                    <li mytitle="班级预约" lay-id="33" data-url="" >班级预约</li>
+                </ul>
+           <div class="layui-tab-content" style="padding: 0px;margin-top: -22px">
+                <div class="layui-tab-item layui-show">
+                    <table class="layui-table">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>实验室名</th>
+                            <th>所在教学楼</th>
+                            <th>实验室编号</th>
+                            <th>预约日期</th>
+                            <th>预约时间</th>
+                            <th>容量</th>
+                            <th>已预约人数</th>
+                            <th>担保老师</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="appoint:${appointments}">
+                            <td th:text="${appoint.lab_appointment_id}"></td>
+                            <td th:text="${appoint.lab_appointment_name}"></td>
+                            <td th:text="${appoint.lab_appointment_build}"></td>
+                            <td th:text="${appoint.lab_appointment_num}"></td>
+                            <td th:text="${appoint.lab_appointment_date}"></td>
+                            <td th:text="${appoint.lab_appointment_time == 1 ? '08:00--10:00':(appoint.lab_appointment_time == 2 ? '10:00--12:00':(
+                            appoint.lab_appointment_time == 3 ? '14:00--16:00':(appoint.lab_appointment_time == 4 ? '16:00--18:00': '19:00--21:00')))}"></td>
+                            <td th:text="${appoint.lab_appointment_capacity}"></td>
+                            <td th:text="${appoint.lab_appointment_people}"></td>
+                            <td th:text="${appoint.lab_appointment_teacher}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!--评论-->
+                    <div class="fly-panel detail-box" id="flyReply">
+                        <div th:fragment="commentList">
+                        <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+                            <legend style="text-align: center;">评论</legend>
+                        </fieldset>
+                            <div th:each="comment : ${comments}">
+                        <ul class="jieda photos" id="jieda" style="margin-left: 30px">
+                            <li data-id="13">
+                                <div class="detail-about detail-about-reply">
+                                    <a class="jie-user" href="">
+                                        <img src="http://t.cn/RCzsdCq" alt="">
+                                        <cite th:text="${comment.comment_username}"></cite>
+                                    </a>
+                                    <div class="detail-hits" >
+                                        <span th:text="${#dates.format(comment.comment_time,'yyyy-MM-dd HH:mm:ss')}"></span>
+                                    </div>
+                                </div>
+                                <div class="detail-body jieda-body" th:text="${comment.comment_content}"></div>
+                                <div class="jieda-reply">
+                                    <span type="button" onclick="reply(this)" id="reply" data-commentid="1" data-commentname="哈哈"
+                                          th:attr="data-commentid=${comment.id},data-commentname=${comment.comment_username}">
+                                        回复</span>
+                                    <div class="jieda-admin">
+                                        <span type="del">删除</span>
+                                    </div>
+                                </div>
+                                <!--第二级评论-->
+                                <div class="comments" th:if="${#arrays.length(comment.replyComments)}>0">
+                                    <div th:each="reply : ${comment.replyComments}">
+                                        <ul class="jieda photos" style="margin-left: 30px">
+                                                <div class="detail-about detail-about-reply">
+                                                    <a class="jie-user" href="">
+                                                        <img src="http://t.cn/RCzsdCq" alt="">
+                                                        <cite th:text="${reply.comment_username}"></cite>
+                                                    </a>
+                                                    <div class="detail-hits" >
+                                                        <span th:text="${#dates.format(reply.comment_time,'yyyy-MM-dd HH:mm:ss')}"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="detail-body jieda-body" th:text="${reply.comment_content}"></div>
+                                                <div class="jieda-reply">
+                                    <span type="button" onclick="reply(this)" data-commentid="1" data-commentname="哈哈"
+                                          th:attr="data-commentid=${reply.id},data-commentname=${reply.comment_username}">
+                                        回复</span>
+                                                </div>
+                                        </ul>
+                                </div>
+                                </div>
+                            </li>
+                        </ul>
+                        </div>
+                        </div>
+                    </div>
+                        <div class="layui-form layui-form-pane" style="margin-left: 30px">
+                            <form action="" method="post">
+                                <div class="layui-form-item layui-form-text">
+                                    <div class="layui-input-block">
+                                        <div style="display: none">
+                                        <span id="student_name" name="student_name" th:text="${session.student_name}"></span>
+                                        <span th:text="${session.student_id}" id="student_id" name="student_id" ></span>
+                                        <input type="text" id="parentComment" th:value="-1">
+                                        </div>
+                                    <textarea id="content" name="content" placeholder="我想回答" class="layui-textarea fly-editor"
+                                              style="height: 150px;width: 500px"></textarea>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <button onclick="addComment()" id="add_comment" type="button" class="layui-btn" >发表</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                <!--个人预约-->
+                <div class="layui-tab-item" style="width: 600px;margin-top: 30px;">
+                    <form class="layui-form" id="book" method="post" >
+                        <div class="layui-form-item" style="display: none">
+                            <label class="layui-form-label">实验室编号</label>
+                            <span th:text="${session.laboratory_id}" id="laboratory_id" name="laboratory_id"></span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">实验室名称</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="lab_appointment_name" name="lab_appointment_name" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">所在教学楼</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="lab_appointment_build" name="lab_appointment_build" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">实验室编号</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="lab_appointment_num" name="lab_appointment_num" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                            <label class="layui-form-label">预约日期</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="lab_appointment_date" name="lab_appointment_date" lay-verify="date" autocomplete="off"  placeholder="年月日" class="layui-input">
+                            </div>
+                            </div>
+                            <div class="layui-inline">
+                            <label class="layui-form-label">预约时间段</label>
+                            <div class="layui-input-block">
+                                <select type="text" id="lab_appointment_time" name="lab_appointment_time" lay-verify="title" autocomplete="off" placeholder="请选择" class="layui-input">
+                                    <option style="display: none"></option>
+                                    <option value="1">08:00--10:00</option>
+                                    <option value="2">10:00--12:00</option>
+                                    <option value="3">14:00--16:00</option>
+                                    <option value="4">16:00--18:00</option>
+                                    <option value="5">19:00--21:00</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">实验室容量</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="lab_appointment_capacity" name="lab_appointment_capacity" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">预约人数</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="lab_appointment_people" name="lab_appointment_people" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">担保老师</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="lab_appointment_teacher" name="lab_appointment_teacher" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">申请理由</label>
+                            <div class="layui-input-block">
+                                <textarea id="lab_appointment_reason" name="lab_appointment_reason"  placeholder="请输入" class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button type="button" class="layui-btn" id="add-person-btn" >提交</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            <div class="layui-tab-item" style="width: 600px;margin-top: 30px;">
+                <form class="layui-form" id="class" method="post" lay-filter="example">
+                    <div class="layui-form-item" style="display: none;">
+                        <label class="layui-form-label">实验室编号</label>
+                        <span th:text="${session.laboratory_id}" id="class_laboratory_id" name="laboratory_id"></span>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">实验室名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="class_lab_appointment_name" name="lab_appointment_name" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">所在教学楼</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="class_lab_appointment_build" name="lab_appointment_build" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">实验室编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="class_lab_appointment_num" name="lab_appointment_num" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">预约日期</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="class_lab_appointment_date" name="lab_appointment_date" lay-verify="date" autocomplete="off"  placeholder="年月日" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">预约时间段</label>
+                            <div class="layui-input-block">
+                                <select type="text" id="class_lab_appointment_time" name="lab_appointment_time" lay-verify="title" autocomplete="off" placeholder="请选择" class="layui-input">
+                                    <option style="display: none"></option>
+                                    <option value="1">08:00--10:00</option>
+                                    <option value="2">10:00--12:00</option>
+                                    <option value="3">14:00--16:00</option>
+                                    <option value="4">16:00--18:00</option>
+                                    <option value="5">19:00--21:00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">实验室容量</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="class_lab_appointment_capacity" name="lab_appointment_capacity" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                        <label class="layui-form-label">预约班级</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="class_lab_appointment_class" name="lab_appointment_people" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                        </div>
+                        </div>
+                        <div class="layui-inline">
+                        <label class="layui-form-label">预约人数</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="class_lab_appointment_people" name="lab_appointment_people" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                        </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">担保老师</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="class_lab_appointment_teacher" name="lab_appointment_teacher" lay-verify="title" autocomplete="off" placeholder="请输入" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">申请理由</label>
+                        <div class="layui-input-block">
+                            <textarea id="class_lab_appointment_reason" name="lab_appointment_reason"  placeholder="请输入" class="layui-textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn" id="add-class-btn" >提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+         </div>
+
+
+
+<script th:src="@{/static/layui/layui.all.js}"></script>
+<script th:src="@{/static/jquery-3.3.1.min.js}"></script>
+<script th:inline="none">
+    // 计算页面的实际高度，iframe自适应会用到
+    function calcPageHeight(doc) {
+        var cHeight = Math.max(doc.body.clientHeight, doc.documentElement.clientHeight);
+        var sHeight = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
+        var height  = Math.max(cHeight, sHeight);
+        return height;
+    }
+    //根据ID获取iframe对象
+    var ifr = window.parent.document.getElementById('appoint');
+    ifr.onload = function() {
+        //解决打开高度太高的页面后再打开高度较小页面滚动条不收缩
+        ifr.style.height='0px';
+        var iDoc = ifr.contentDocument || ifr.document;
+        var height = calcPageHeight(iDoc);
+        if(height < 1500){
+            height = 1500;
+        }
+        ifr.style.height = height + 'px';
+    }
+    //回复
+    function reply(obj){
+        var commentId = $(obj).data("commentid");
+        var commentName = $(obj).data("commentname");
+        if (commentId){
+            $("#parentComment").val(commentId);
+        }
+        $('#content').attr("placeholder","@"+commentName).focus();
+    }
+
+    //发表评论
+    function addComment(){
+        var laboratory_id = $("#laboratory_id").html();
+        var student_id = $("#student_id").html();
+        var student_name = $("#student_name").html();
+        $.post('/comment/insertComment', {
+            "laboratory.id":laboratory_id,
+            comment_userId: student_id,
+            "parentComment.id": $('#parentComment').val(),
+            comment_username: student_name,
+            comment_content: $('#content').val()
+        }, function (data) {
+            //根据后台返回的参数，来进行判断
+            if (data == "OK") {
+                layer.msg("发表成功");
+            } else {
+                layer.msg("发表失败");
+            }
+        });
+    }
+
+    layui.use(['table','layer','form','element','laydate'], function() {
+        var element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        var laydate = layui.laydate;
+        var layer = layui.layer;
+        var $ = layui.$;
+
+        $(function(){
+            var laboratory_id = $("#laboratory_id").html();
+            $("#flyReply").load('/comment/selectComment?laboratory_id='+laboratory_id);
+        });
+
+        laydate.render({
+            elem: '#lab_appointment_date'
+            ,format: 'yyyy年MM月dd日'
+        });
+        laydate.render({
+            elem: '#class_lab_appointment_date'
+            ,format: 'yyyy年MM月dd日'
+        });
+
+        $("#add-person-btn").on('click',(function () {
+            layer.msg("成功");
+            var laboratory_id = $("#laboratory_id").html();
+            var student_id = $("#student_id").html();
+            var student_name = $("#student_name").html();
+                $.post('/appointment/insertAppointment', {
+                    laboratory_id:laboratory_id,
+                    student_id:student_id,
+                    student_name:student_name,
+                    lab_appointment_name: $('#lab_appointment_name').val(),
+                    lab_appointment_build: $('#lab_appointment_build').val(),
+                    lab_appointment_num: $('#lab_appointment_num').val(),
+                    lab_appointment_capacity: $('#lab_appointment_capacity').val(),
+                    lab_appointment_date: $('#lab_appointment_date').val(),
+                    lab_appointment_time: $('#lab_appointment_time').val(),
+                    lab_appointment_class: $('#lab_appointment_class').val(),
+                    lab_appointment_people: $('#lab_appointment_people').val(),
+                    lab_appointment_teacher: $('#lab_appointment_teacher').val(),
+                    lab_appointment_reason: $('#lab_appointment_reason').val()
+                }, function (data) {
+                    //根据后台返回的参数，来进行判断
+                    if (data == "OK") {
+                        layer.msg("预约成功");
+                    } else {
+                        layer.msg("预约失败");
+                    }
+                });
+        }));
+        $("#add-class-btn").on('click',(function () {
+            var laboratory_id = $("#class_laboratory_id").html();
+            var student_id = $("#student_id").html();
+            $.post('/appointment/insertAppointment', {
+                laboratory_id:laboratory_id,
+                student_id:student_id,
+                lab_appointment_name: $('#class_lab_appointment_name').val(),
+                lab_appointment_build: $('#class_lab_appointment_build').val(),
+                lab_appointment_num: $('#class_lab_appointment_num').val(),
+                lab_appointment_capacity: $('#class_lab_appointment_capacity').val(),
+                lab_appointment_date: $('#class_lab_appointment_date').val(),
+                lab_appointment_time: $('#class_lab_appointment_time').val(),
+                lab_appointment_class: $('#class_lab_appointment_class').val(),
+                lab_appointment_people: $('#class_lab_appointment_people').val(),
+                lab_appointment_teacher: $('#class_lab_appointment_teacher').val(),
+                lab_appointment_reason: $('#class_lab_appointment_reason').val()
+            }, function (data) {
+                //根据后台返回的参数，来进行判断
+                if (data == "OK") {
+                    layer.msg("预约成功");
+                } else {
+                    layer.msg("预约失败");
+                }
+            });
+
+        }));
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <link rel="stylesheet" th:href="@{/static/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/static/css/style.css}">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+</head>
+<body>
+<div id="particles-js">
+    <form class="layui-form" method="post" action="insertStudent" id="register">
+        <div class="register-top">注册</div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/name.png}"/></div>
+            <div class="login-center-input">
+                <input type="text" name="student_name" value="" placeholder="请输入您的用户名" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的用户名'"/>
+                <div class="login-center-input-text">用户名</div>
+            </div>
+        </div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/name.png}"/></div>
+            <div class="login-center-input">
+                <input type="text" name="student_num" value="" placeholder="请输入您的学号" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的学号'"/>
+                <div class="login-center-input-text">学号</div>
+            </div>
+        </div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/password.png}"/></div>
+            <div class="login-center-input">
+                <input type="password" name="student_pwd" value="" placeholder="请输入您的密码" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的密码'"/>
+                <div class="login-center-input-text">密码</div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="login-center clearfix">
+                <div class="login-center-img"><img th:src="@{/static/image/name.png}"/></div>
+            <div class="layui-input-block" style="float: left;width: 230px;margin-left: 15px">
+                <select name="student_sex" lay-filter="aihao">
+                    <option value="男" selected="">男</option>
+                    <option value="女">女</option>
+                </select>
+            </div>
+            </div>
+        </div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/name.png}"/></div>
+            <div class="login-center-input">
+                <input type="text" name="student_depart" value="" placeholder="请输入您的院系" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的院系'"/>
+                <div class="login-center-input-text">院系</div>
+            </div>
+        </div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/name.png}"/></div>
+            <div class="login-center-input">
+                <input type="text" name="student_spe" value="" placeholder="请输入您的专业" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的专业'"/>
+                <div class="login-center-input-text">专业</div>
+            </div>
+        </div>
+        <div class="login-center clearfix">
+            <div class="login-center-img"><img th:src="@{/static/image/name.png}"/></div>
+            <div class="login-center-input">
+                <input type="text" name="student_class" value="" placeholder="请输入您的班级" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的班级'"/>
+                <div class="login-center-input-text">班级</div>
+            </div>
+        </div>
+        <div class="login-button">
+            <input type="submit" id="reg" value="注册">
+        </div>
+        <div class="login-button">
+            <input type="button" id="submit" value="登录" onclick="window.location.href='login'">
+        </div>
+    </form>
+    <div class="sk-rotating-plane"></div>
+</div>
+
+<!-- scripts -->
+<script th:src="@{/static/js/particles.min.js}"></script>
+<script th:src="@{/static/js/app.js}"></script>
+<script th:src="@{/static/layui/layui.all.js}"></script>
+</body>
+</html>

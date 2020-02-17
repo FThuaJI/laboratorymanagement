@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的预约</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/css/my.css}">
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>编号</th>
+            <th>实验室名</th>
+            <th>所在教学楼</th>
+            <th>实验室编号</th>
+            <th>预约日期</th>
+            <th>预约时间</th>
+            <th>容量</th>
+            <th>预约人数</th>
+            <th>预约理由</th>
+            <th>担保老师</th>
+            <th>预约类型</th>
+            <th>预约情况</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="appoint:${appointments}">
+            <td th:text="${appoint.lab_appointment_id}"></td>
+            <td th:text="${appoint.lab_appointment_name}"></td>
+            <td th:text="${appoint.lab_appointment_build}"></td>
+            <td th:text="${appoint.lab_appointment_num}"></td>
+            <td th:text="${appoint.lab_appointment_date}"></td>
+            <td th:text="${appoint.lab_appointment_time == 1 ? '08:00--10:00':(appoint.lab_appointment_time == 2 ? '10:00--12:00':(
+                            appoint.lab_appointment_time == 3 ? '14:00--16:00':(appoint.lab_appointment_time == 4 ? '16:00--18:00': '19:00--21:00')))}"></td>
+            <td th:text="${appoint.lab_appointment_capacity}"></td>
+            <td th:text="${appoint.lab_appointment_people}"></td>
+            <td th:text="${appoint.lab_appointment_reason}"></td>
+            <td th:text="${appoint.lab_appointment_teacher}"></td>
+            <td th:text="${appoint.lab_appointment_type == 1 ? '个人预约' : '班级预约'}"></td>
+            <td th:text="${appoint.lab_appointment_handle == 1 ? '预约成功' : (appoint.lab_appointment_handle == 2 ? '等待老师审核' :
+            (appoint.lab_appointment_handle == 3 ? '等待教务人员审核' : (appoint.lab_appointment_handle == 4 ? '老师不同意' : '教务人员不同意')))}"></td>
+            <td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

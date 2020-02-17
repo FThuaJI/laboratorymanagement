@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>预约申请</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+
+</div>
+<script th:src="@{/static/layui/layui.all.js}"></script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="agree">同意</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="disagree">不同意</a>
+</script>
+<script type="text/html" id="time">
+    {{#if (d.lab_appointment_time == '1') {d.lab_appointment_time = '08:00--10:00' }}
+    <span>{{d.lab_appointment_time}}</span>
+    {{# }else if(d.lab_appointment_time == '2'){d.lab_appointment_time = '10:00--12:00' }}
+    <span>{{d.lab_appointment_time}}</span>
+    {{# }else if(d.lab_appointment_time == '3'){d.lab_appointment_time = '14:00--16:00' }}
+    <span>{{d.lab_appointment_time}}</span>
+    {{# }else if(d.lab_appointment_time == '4'){d.lab_appointment_time = '16:00--18:00' }}
+    <span>{{d.lab_appointment_time}}</span>
+    {{# }else {d.lab_appointment_time = '19:00--21:00' }}
+    <span>{{d.lab_appointment_time}}</span>
+    {{# } }}
+</script>
+<script type="text/html" id="type">
+    {{#if (d.lab_appointment_type == 1) {d.lab_appointment_type = '个人预约' }}
+    <span>{{d.lab_appointment_type}}</span>
+    {{# }else {d.lab_appointment_type = '班级预约' }}
+    <span>{{d.lab_appointment_type}}</span>
+    {{# } }}
+</script>
+<script type="text/html" id="handle">
+    {{#if (d.lab_appointment_handle == 1) {d.lab_appointment_handle = '预约成功' }}
+    <span>{{d.lab_appointment_handle}}</span>
+    {{# }else if(d.lab_appointment_handle == 2){d.lab_appointment_handle = '等待老师审核' }}
+    <span>{{d.lab_appointment_handle}}</span>
+    {{# }else if(d.lab_appointment_handle == 3){d.lab_appointment_handle = '等待教务人员审核' }}
+    <span>{{d.lab_appointment_handle}}</span>
+    {{# }else if(d.lab_appointment_handle == 4){d.lab_appointment_handle = '老师不同意' }}
+    <span>{{d.lab_appointment_handle}}</span>
+    {{# }else {d.lab_appointment_handle = '教务人员不同意' }}
+    <span>{{d.lab_appointment_handle}}</span>
+    {{# } }}
+</script>
+<script th:inline="none">
+    layui.use(['table','layer'], function(){
+        var table = layui.table;
+        var layer = layui.layer;
+        var $=layui.$;
+
+        var teacher_name = $("#teacher_name").html();
+        table.render({
+            elem: '#test'
+            ,url:'/appointment/selectAppoint'
+            ,title: '实验室数据表'
+            ,cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'lab_appointment_id', title:'ID', fixed: 'left',sort: true,hide: true}
+                ,{field:'lab_appointment_name', title:'实验室名', edit: 'text'}
+                ,{field:'lab_appointment_build', title:'教学楼', width:100, sort: true}
+                ,{field:'lab_appointment_num', title:'实验室编号',width:120, edit: 'text', sort: true}
+                ,{field:'lab_appointment_date', title:'预约日期',width:150,sort: true}
+                ,{field:'lab_appointment_time', title:'预约时间', sort: true, toolbar: '#time'}
+                ,{field:'lab_appointment_capacity', title:'容量',width:80, sort: true}
+                ,{field:'lab_appointment_people', title:'预约人数', width:100,sort: true}
+                ,{field:'lab_appointment_reason', title:'预约理由', sort: true}
+                ,{field:'lab_appointment_type', title:'预约类型', sort: true, toolbar: '#type'}
+                ,{field:'lab_appointment_handle', title:'预约状态', sort: true,width:150, toolbar: '#handle'}
+                ,{fixed: 'right', title:'操作', width:120 ,toolbar: '#barDemo'}
+            ]]
+        });
+
+        table.on('tool(test)', function(obj) {
+            var data = obj.data; //获得当前行数据
+            if (obj.event === 'agree') {
+                layer.confirm('确定同意吗', function (index) {
+                    $.post('/appointment/updateById', {
+                            lab_appointment_id: data.lab_appointment_id,
+                            lab_appointment_handle: 1
+                        },
+                        function (data) {
+                            if (data == "OK") {
+                                layer.msg("处理成功");
+                            } else {
+                                layer.msg("处理失败");
+                            }
+                            table.reload('test', {//重载表格
+                            })
+                        });
+                });
+            } else if (obj.event === 'disagree') {
+                layer.confirm('确定不同意吗', function (index) {
+                    $.post('/appointment/updateById', {
+                            lab_appointment_id: data.lab_appointment_id,
+                            lab_appointment_handle: 5
+                        },
+                        function (data) {
+                            if (data == "OK") {
+                                layer.msg("处理成功");
+                            } else {
+                                layer.msg("处理失败");
+                            }
+                            table.reload('test', {//重载表格
+                            })
+                        });
+                });
+            }
+        })
+    })
+</script>
+</body>
+</html>
